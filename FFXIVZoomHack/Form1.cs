@@ -29,8 +29,10 @@ namespace FFXIVZoomHack
             _autoApplyCheckbox.Checked = Settings.AutoApply;
             _autoApplyCheckbox.CheckedChanged += AutoApplyCheckChanged;
 
-            _zoomUpDown.Value = (decimal) Settings.DesiredZoom;
-            _zoomUpDown.ValueChanged += NumberChanged;
+            _zoomMinUpDown.Value = (decimal) Settings.DesiredZoomMin;
+            _zoomMinUpDown.ValueChanged += NumberChanged;
+            _zoomMaxUpDown.Value = (decimal) Settings.DesiredZoomMax;
+            _zoomMaxUpDown.ValueChanged += NumberChanged;
             _fovUpDown.Value = (decimal) Settings.DesiredFov;
             _fovUpDown.ValueChanged += NumberChanged;
 
@@ -41,7 +43,8 @@ namespace FFXIVZoomHack
 
         private void NumberChanged(object sender, EventArgs e)
         {
-            Settings.DesiredZoom = (float) _zoomUpDown.Value;
+            Settings.DesiredZoomMin = (float) _zoomMinUpDown.Value;
+            Settings.DesiredZoomMax = (float) _zoomMaxUpDown.Value;
             Settings.DesiredFov = (float) _fovUpDown.Value;
             Settings.Save();
             ApplyChanges();
@@ -147,9 +150,14 @@ namespace FFXIVZoomHack
         [DllImport("USER32.DLL")]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
 
-        private void _zoomDefaultButton_Click(object sender, EventArgs e)
+        private void _zoomMinDefaultButton_Click(object sender, EventArgs e)
         {
-            _zoomUpDown.Value = 20m;
+            _zoomMinUpDown.Value = 1.5m;
+        }
+
+        private void _zoomMaxDefaultButton_Click(object sender, EventArgs e)
+        {
+            _zoomMaxUpDown.Value = 20m;
         }
 
         private void _fovDefaultButton_Click(object sender, EventArgs e)
@@ -179,11 +187,13 @@ namespace FFXIVZoomHack
 
                         Settings.DX11_StructureAddress = offsets.DX11_StructureAddress;
                         Settings.DX11_ZoomCurrent = offsets.DX11_ZoomCurrent;
+                        Settings.DX11_ZoomMin = offsets.DX11_ZoomMin;
                         Settings.DX11_ZoomMax = offsets.DX11_ZoomMax;
                         Settings.DX11_FovCurrent = offsets.DX11_FovCurrent;
                         Settings.DX11_FovMax = offsets.DX11_FovMax;
                         Settings.DX9_StructureAddress = offsets.DX9_StructureAddress;
                         Settings.DX9_ZoomCurrent = offsets.DX9_ZoomCurrent;
+                        Settings.DX9_ZoomMin = offsets.DX9_ZoomMin;
                         Settings.DX9_ZoomMax = offsets.DX9_ZoomMax;
                         Settings.DX9_FovCurrent = offsets.DX9_FovCurrent;
                         Settings.DX9_FovMax = offsets.DX9_FovMax;

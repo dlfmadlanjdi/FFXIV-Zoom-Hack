@@ -16,10 +16,11 @@ namespace FFXIVZoomHack
         {
             AutoApply = true;
 
-            DesiredZoom = 20;
+            DesiredZoomMin = 1.5f;
+            DesiredZoomMax = 20;
             DesiredFov = 0.78f;
 
-            OffsetUpdateLocation = @"https://raw.githubusercontent.com/jayotterbein/FFXIV-Zoom-Hack/master/Offsets.xml";
+            OffsetUpdateLocation = @"https://raw.githubusercontent.com/itsurea/FFXIV-Zoom-Hack/master/Offsets.xml";
             LastUpdate = "unupdated";
         }
 
@@ -38,16 +39,20 @@ namespace FFXIVZoomHack
 
         public bool AutoApply { get; set; }
         public float DesiredFov { get; set; }
-        public float DesiredZoom { get; set; }
+        public float DesiredZoomMin { get; set; }
+
+        public float DesiredZoomMax { get; set; }
 
         public int[] DX9_StructureAddress { get; set; }
         public int DX9_ZoomCurrent { get; set; }
+        public int DX9_ZoomMin { get; set; }
         public int DX9_ZoomMax { get; set; }
         public int DX9_FovCurrent { get; set; }
         public int DX9_FovMax { get; set; }
 
         public int[] DX11_StructureAddress { get; set; }
         public int DX11_ZoomCurrent { get; set; }
+        public int DX11_ZoomMin { get; set; }
         public int DX11_ZoomMax { get; set; }
         public int DX11_FovCurrent { get; set; }
         public int DX11_FovMax { get; set; }
@@ -77,6 +82,7 @@ namespace FFXIVZoomHack
                                 .Select(x => int.Parse(x, NumberStyles.HexNumber, CultureInfo.InvariantCulture))
                                 .ToArray();
                             settings.DX9_ZoomCurrent = int.Parse(element.Element("ZoomCurrent").Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                            settings.DX9_ZoomMin = int.Parse(element.Element("ZoomMin").Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                             settings.DX9_ZoomMax = int.Parse(element.Element("ZoomMax").Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                             settings.DX9_FovCurrent = int.Parse(element.Element("FovCurrent").Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                             settings.DX9_FovMax = int.Parse(element.Element("FovMax").Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
@@ -89,15 +95,23 @@ namespace FFXIVZoomHack
                                 .Select(x => int.Parse(x, NumberStyles.HexNumber, CultureInfo.InvariantCulture))
                                 .ToArray();
                             settings.DX11_ZoomCurrent = int.Parse(element.Element("ZoomCurrent").Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                            settings.DX11_ZoomMin = int.Parse(element.Element("ZoomMin").Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                             settings.DX11_ZoomMax = int.Parse(element.Element("ZoomMax").Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                             settings.DX11_FovCurrent = int.Parse(element.Element("FovCurrent").Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                             settings.DX11_FovMax = int.Parse(element.Element("FovMax").Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                             break;
-                        case "DesiredZoom":
-                            settings.DesiredZoom = float.Parse(element.Value, CultureInfo.InvariantCulture);
-                            if (settings.DesiredZoom < 1f || settings.DesiredZoom > 1000f)
+                        case "DesiredZoomMin":
+                            settings.DesiredZoomMin = float.Parse(element.Value, CultureInfo.InvariantCulture);
+                            if (settings.DesiredZoomMin < 1.5f || settings.DesiredZoomMin > 1000f)
                             {
-                                settings.DesiredZoom = 20f;
+                                settings.DesiredZoomMin = 1.5f;
+                            }
+                            break;
+                        case "DesiredZoomMax":
+                            settings.DesiredZoomMax = float.Parse(element.Value, CultureInfo.InvariantCulture);
+                            if (settings.DesiredZoomMax < 1.5f || settings.DesiredZoomMax > 1000f)
+                            {
+                                settings.DesiredZoomMax = 20f;
                             }
                             break;
                         case "DesiredFov":
@@ -141,6 +155,7 @@ namespace FFXIVZoomHack
             yield return new XElement("DX9",
                 new XElement("StructureAddress", string.Join(",", DX9_StructureAddress.Select(x => x.ToString("X", CultureInfo.InvariantCulture)))),
                 new XElement("ZoomCurrent", DX9_ZoomCurrent.ToString("X", CultureInfo.InvariantCulture)),
+                new XElement("ZoomMin", DX9_ZoomMin.ToString("X", CultureInfo.InvariantCulture)),
                 new XElement("ZoomMax", DX9_ZoomMax.ToString("X", CultureInfo.InvariantCulture)),
                 new XElement("FovCurrent", DX9_FovCurrent.ToString("X", CultureInfo.InvariantCulture)),
                 new XElement("FovMax", DX9_FovMax.ToString("X", CultureInfo.InvariantCulture))
@@ -148,6 +163,7 @@ namespace FFXIVZoomHack
             yield return new XElement("DX11",
                 new XElement("StructureAddress", string.Join(",", DX11_StructureAddress.Select(x => x.ToString("X", CultureInfo.InvariantCulture)))),
                 new XElement("ZoomCurrent", DX11_ZoomCurrent.ToString("X", CultureInfo.InvariantCulture)),
+                new XElement("ZoomMin", DX11_ZoomMin.ToString("X", CultureInfo.InvariantCulture)),
                 new XElement("ZoomMax", DX11_ZoomMax.ToString("X", CultureInfo.InvariantCulture)),
                 new XElement("FovCurrent", DX11_FovCurrent.ToString("X", CultureInfo.InvariantCulture)),
                 new XElement("FovMax", DX11_FovMax.ToString("X", CultureInfo.InvariantCulture))
@@ -159,7 +175,8 @@ namespace FFXIVZoomHack
                 yield break;
             }
             yield return new XElement("AutoApply", AutoApply.ToString(CultureInfo.InvariantCulture));
-            yield return new XElement("DesiredZoom", DesiredZoom.ToString(CultureInfo.InvariantCulture));
+            yield return new XElement("DesiredZoomMin", DesiredZoomMin.ToString(CultureInfo.InvariantCulture));
+            yield return new XElement("DesiredZoomMax", DesiredZoomMax.ToString(CultureInfo.InvariantCulture));
             yield return new XElement("DesiredFov", DesiredFov.ToString(CultureInfo.InvariantCulture));
             yield return new XElement("OffsetUpdateLocation", OffsetUpdateLocation);
         }

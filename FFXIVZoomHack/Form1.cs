@@ -178,6 +178,15 @@ namespace FFXIVZoomHack
                     try
                     {
                         var offsets = Settings.Load(Settings.OffsetUpdateLocation);
+                        Console.WriteLine(Settings.OffsetUpdateLocation);
+                        Console.WriteLine(offsets.DX11_StructureAddress);
+                        Console.WriteLine(offsets.DX11_ZoomCurrent);
+                        Console.WriteLine(offsets.DX11_ZoomMin);
+                        Console.WriteLine(offsets.DX11_ZoomMax);
+                        Console.WriteLine(offsets.DX11_FovCurrent);
+                        Console.WriteLine(offsets.DX11_FovMax);
+                        Console.WriteLine(offsets.DX11_StructureAddress);
+
 
                         if (string.Equals(Settings.LastUpdate, offsets.LastUpdate))
                         {
@@ -223,7 +232,7 @@ namespace FFXIVZoomHack
 
         private void _updateLocationDefault_Click(object sender, EventArgs e)
         {
-            _updateOffsetsTextbox.Text = @"https://raw.githubusercontent.com/jayotterbein/FFXIV-Zoom-Hack/master/Offsets.xml";
+            _updateOffsetsTextbox.Text = @"https://raw.githubusercontent.com/itsurea/FFXIV-Zoom-Hack/master/Offsets.xml";
         }
     }
 }
